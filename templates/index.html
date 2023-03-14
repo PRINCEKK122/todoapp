@@ -9,11 +9,16 @@
 </head>
 
 <body>
+    <form action="/todos/create" method="POST"">
+        <label>Add todo</label>
+        <input type="text" name="description" id="todo">
+        <input type="submit" value="Submit">
+    </form>
     <ul>
         {% for d in data %}
             <li>{{d.description}}</li>
         {% endfor %}
-    </ul>
+    </ul>  
 </body>
 
 </html>
