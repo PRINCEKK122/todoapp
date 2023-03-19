@@ -66,7 +66,22 @@ def set_completed_todo(todo_id):
         print("Failed to set complete")
     finally:
         db.session.close()
-    return redirect(url_for("index"))
+    return jsonify({"success": True})
+
+
+@app.route("/todos/<int:todo_id>/delete_todo", methods=["DELETE"])
+def delete_todo(todo_id):
+    try:
+        todo = Todo.query.get(todo_id)
+        print(todo)
+        db.session.delete(todo)
+        db.session.commit()
+    except:
+        db.session.rollback()
+    finally:
+        db.session.close()
+
+    return jsonify({"success": True})
 
 
 if __name__ == "__main__":

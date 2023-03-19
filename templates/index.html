@@ -14,31 +14,86 @@
             list-style: none;
             padding: 0;
             margin: 0;
+            width: 200px;
+        }
+
+        li {
+            clear: both;
+        }
+
+        li button {
+            -webkit-appearance: none;
+            border: none;
+            outline: none;
+            color: red;
+            float: right;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        .lists-wrapper,
+        .todos-wrapper {
+            display: inline-block;
+            vertical-align: top;
         }
     </style>
     <title>Todo App</title>
 </head>
 
 <body>
-    <form id="form">
-        <input type="text" name="description" id="description">
-        <input type="submit" value="Submit">
-    </form>
-    <div id="error" class="hidden">Something went wrong!</div>
-    <ul id="todos">
-        {% for d in data %}
-        <li>
-            <input data-id="{{d.id}}" type="checkbox" {% if d.completed %} checked {% endif %} class="check-completed" />
-            {{d.description}}
-        </li>
-        {% endfor %}
-    </ul>
-
+    <div class="lists-wrapper">
+        <ul id="lists">
+            {% for list in lists %}
+            <li>
+                <a href="/lists/{{ list.id }}">
+                    {{ list.name }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="todos-wrapper">
+        <form id="form">
+            <input type="text" id="description" name="description" />
+            <input type="submit" value="Create" />
+        </form>
+        <div id="error" class="hidden">Something went wrong!</div>
+        <ul id="todos">
+            {% for todo in data %}
+            <li>
+                <input class="check-completed" data-id="{{ todo.id }}" type="checkbox" {% if todo.completed %} checked
+                    {% endif %} />
+                {{ todo.description }}
+                <button class="delete-btn" data-id="{{todo.id}}">&cross;</button>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
     <script>
+        const deleteBtns = document.querySelectorAll(".delete-btn");
+        for (let i = 0; i < deleteBtns.length; i++) {
+            const deleteBtn = deleteBtns[i];
+            deleteBtn.onclick = function(e) {
+                todoId = deleteBtn.dataset["id"];
+                fetch("/todos/" + todoId + "/delete_todo", {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                })
+                .then(function() {
+                    console.log("done");
+                })
+                .catch(function() {
+                    console.log("Failed to delete");
+                })
+            }
+        }
+
         const checkboxes = document.querySelectorAll(".check-completed");
         for (let i = 0; i < checkboxes.length; i++) {
             const checkbox = checkboxes[i];
-            checkbox.onchange = function(e) {
+            checkbox.onchange = function (e) {
                 console.log("event", e)
                 const newCompleted = e.target.checked;
                 const todoId = e.target.dataset["id"];
@@ -51,12 +106,12 @@
                         "Content-Type": "application/json"
                     }
                 })
-                .then(function() {
-                    document.getElementById("error").className = "hidden";
-                })
-                .catch(function () {
-                    document.getElementById("error").className = "";
-                })
+                    .then(function () {
+                        document.getElementById("error").className = "hidden";
+                    })
+                    .catch(function () {
+                        document.getElementById("error").className = "";
+                    })
             };
         }
 
