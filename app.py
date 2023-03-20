@@ -33,12 +33,17 @@ class TodoList(db.Model):
 with app.app_context():
     db.create_all()
 
-
 @app.route("/")
 def index():
+    return redirect(url_for("get_list_todos", list_id=1))
+
+@app.route("/lists/<int:list_id>")
+def get_list_todos(list_id):
     return render_template(
         "index.html",
-        data=Todo.query.order_by(Todo.id).all(),
+        lists=TodoList.query.all(),
+        active_list=TodoList.query.get(list_id),
+        data=Todo.query.filter_by(todolists=list_id).order_by(Todo.id).all(),
     )
 
 
@@ -48,10 +53,13 @@ def create_todo():
     error = False
     try:
         description = request.get_json()["description"]
+        list_id = request.get_json()["list_id"]
         todo = Todo(description=description)
-        body["description"] = todo.description
+        active_list = TodoList.query.get(list_id)
+        todo.list = active_list
         db.session.add(todo)
         db.session.commit()
+        body["description"] = todo.description
     except:
         error = True
         db.session.rollback()
