@@ -32,12 +32,30 @@
         .todos-wrapper {
             display: inline-block;
             vertical-align: top;
+            border: 1px solid red;
+        }
+
+        .lists-wrapper h3,
+        .todos-wrapper h3 {
+            margin-top: 0;
+        }
+
+        .todos-wrapper h4{
+            margin: 0;
         }
     </style>
 </head>
 
 <body>
+    <h2>A SAMPLE VERSION OF TODO APP</h2>
+    
     <div class="lists-wrapper">
+        <h3>TODO LISTS</h3>
+        <form id="form-lists">
+            <label for="create_list">Create Lists</label>
+            <input type="text" name="create_list" id="create_list">
+            <input type="submit" value="Create List">
+        </form>
         <ul id="lists">
             {% for list in lists %}
             <li>
@@ -48,9 +66,12 @@
             {% endfor %}
         </ul>
     </div>
+    
     <div class="todos-wrapper">
+        <h3>TODO ITEMS</h3>
         <h4>{{ active_list.name }}</h4>
         <form id="form">
+            <label for="description">Create Tasks</label>
             <input type="text" id="description" name="description" />
             <input type="submit" value="Create" />
         </form>
