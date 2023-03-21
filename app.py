@@ -30,12 +30,18 @@ class TodoList(db.Model):
     def __repr__(self):
         return f"<TodoList {self.id} {self.name}>"
 
+
 with app.app_context():
     db.create_all()
 
+
+##################################################
+###### TODOITEMS ROUTES
+##################################################
 @app.route("/")
 def index():
     return redirect(url_for("get_list_todos", list_id=1))
+
 
 @app.route("/lists/<int:list_id>")
 def get_list_todos(list_id):
@@ -100,6 +106,33 @@ def delete_todo(todo_id):
         db.session.close()
 
     return jsonify({"success": True})
+
+
+#######################################################
+######## TODOITEMS ROUTES
+#######################################################
+@app.route("/todoitems", methods=["POST"])
+def create_todoitems():
+    body = {}
+    error = False
+    try:
+        name = request.get_json()["name"]
+        print(name)
+        todolist = TodoList(name=name)
+        print(todolist)
+        db.session.add(todolist)
+        db.session.commit()
+        body["name"] = name
+    except:
+        db.session.rollback()
+        error = True
+    finally:
+        db.session.close()
+    if error:
+        print("Something went wrong")
+        abort(400)
+    else:
+        return jsonify(body)
 
 
 if __name__ == "__main__":
